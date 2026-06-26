@@ -1,0 +1,23 @@
+{
+  "permissions": {
+   "allow": [
+     "Bash(npm run dev)",
+     "Bash(npm run build)",
+     "Bash(npx prisma *)",
+     "Bash(npm install *)"
+   ]
+  },
+  "hooks": {
+   "PostToolUse": [
+     {
+      "matcher": "Write|Edit",
+      "hooks": [
+        {
+         "type": "command",
+         "command": "echo \"文件已修改，建议检查一下改了什么\""
+        }
+      ]
+     }
+   ]
+  }
+}
