@@ -7,8 +7,9 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 function createPrismaClient() {
+  const dbUrl = process.env.DATABASE_URL || "file:./dev.db";
   return new PrismaClient({
-    adapter: new PrismaBetterSqlite3({ url: "file:./dev.db" }),
+    adapter: new PrismaBetterSqlite3({ url: dbUrl }),
   });
 }
 

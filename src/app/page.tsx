@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { prisma } from "@/lib/prisma";
 import SearchBar from "@/components/search-bar";
 import CategoryFilter from "@/components/category-filter";
@@ -20,7 +21,8 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   const sp = await searchParams;
   const search = sp.search || "";
   const category = sp.category || "";
-  const page = Math.max(1, parseInt(sp.page || "1", 10));
+  const pageNum = parseInt(sp.page || "1", 10);
+  const page = isNaN(pageNum) || pageNum < 1 ? 1 : pageNum;
 
   // 并行获取分类列表和商品列表
   const [categories, productData] = await Promise.all([
@@ -66,7 +68,9 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       <div className="mb-8 space-y-4">
         <h1 className="text-2xl font-bold text-gray-900">商品列表</h1>
         <SearchBar initialSearch={search} />
-        <CategoryFilter categories={categoryList} />
+        <Suspense fallback={<div className="flex gap-2">{Array.from({ length: 5 }, (_, i) => (<div key={i} className="h-8 w-20 animate-pulse rounded-full bg-gray-200" />))}</div>}>
+          <CategoryFilter categories={categoryList} />
+        </Suspense>
         {search && (
           <p className="text-sm text-gray-500">
             搜索「{search}」共找到 {total} 件商品
