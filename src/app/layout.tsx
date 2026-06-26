@@ -32,6 +32,11 @@ export default async function RootLayout({
               <Link href="/cart" className="hover:text-blue-600 transition-colors">
                 购物车
               </Link>
+              {user && user.role === "ADMIN" && (
+                <Link href="/admin" className="text-amber-600 hover:text-amber-700 transition-colors font-medium">
+                  后台管理
+                </Link>
+              )}
               {user && (
                 <Link href="/orders" className="hover:text-blue-600 transition-colors">
                   我的订单
