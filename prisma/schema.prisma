@@ -1,0 +1,83 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+// 用户
+model User {
+  id      Int      @id @default(autoincrement())
+  name     String
+  email    String    @unique
+  password  String
+  role     String    @default("USER")  // USER 或 ADMIN
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  cartItems CartItem[]
+  orders   Order[]
+}
+
+// 商品分类
+model Category {
+  id      Int      @id @default(autoincrement())
+  name    String   @unique
+  slug    String   @unique      // URL 友好的英文标识
+  products Product[]
+}
+
+// 商品
+model Product {
+  id        Int       @id @default(autoincrement())
+  name      String
+  description String     @default("")
+  price      Float
+  image      String     @default("")
+  stock      Int       @default(0)
+  categoryId  Int
+  category   Category   @relation(fields: [categoryId], references: [id])
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  cartItems   CartItem[]
+  orderItems  OrderItem[]
+}
+
+// 购物车项
+model CartItem {
+  id      Int     @id @default(autoincrement())
+  userId   Int
+  productId Int
+  quantity  Int     @default(1)
+  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  @@unique([userId, productId])  // 同一用户同一商品只允许一条记录
+}
+
+// 订单
+model Order {
+  id      Int       @id @default(autoincrement())
+  userId   Int
+  status   String     @default("PENDING")
+  total    Float
+  createdAt DateTime   @default(now())
+  user     User      @relation(fields: [userId], references: [id])
+  items    OrderItem[]
+}
+
+// 订单明细
+model OrderItem {
+  id        Int    @id @default(autoincrement())
+  orderId    Int
+  productId   Int
+  productName String  // 下单时锁定商品名，防止后续改名影响历史订单
+  price      Float   // 下单时锁定价格
+  quantity   Int
+  order      Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product    Product @relation(fields: [productId], references: [id])
+}
