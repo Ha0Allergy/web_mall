@@ -32,6 +32,11 @@ export default async function RootLayout({
               <Link href="/cart" className="hover:text-blue-600 transition-colors">
                 购物车
               </Link>
+              {user && (
+                <Link href="/orders" className="hover:text-blue-600 transition-colors">
+                  我的订单
+                </Link>
+              )}
               <UserNav user={user} />
             </nav>
           </div>
